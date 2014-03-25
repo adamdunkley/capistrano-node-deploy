@@ -87,13 +87,13 @@ EOD
 
     desc "Check the status of forever"
     task :status do
-      run "forever list"
+      run "sudo -u #{node_user} forever list"
     end
 
     desc "Start the node application"
     task :start do
       if run_method == 'forever'
-        run "cd #{current_path} && forever -c '#{node_binary}' -m #{max_run} --minUptime #{min_up_time} --spinSleepTime #{spin_sleep_time} -o #{shared_path}/console.log -e #{shared_path}/error.log start #{current_path}/#{app_command}"
+        run "cd #{current_path} && sudo -u #{node_user} forever -c '#{node_binary}' -m #{max_run} --minUptime #{min_up_time} --spinSleepTime #{spin_sleep_time} -o #{shared_path}/console.log -e #{shared_path}/error.log start #{current_path}/#{app_command} #{app_args}"
       else
         sudo "start #{upstart_job_name}"
       end
@@ -102,7 +102,7 @@ EOD
     desc "Stop the node application"
     task :stop do
       if run_method == 'forever'
-        run "forever stop #{current_path}/#{app_command}"
+        run "sudo -u #{node_user} forever stop #{current_path}/#{app_command}"
       else
         sudo "stop #{upstart_job_name}"
       end
@@ -111,7 +111,7 @@ EOD
     desc "Restart the node application"
     task :restart do
       if run_method == 'forever'
-        run "forever restart #{current_path}/#{app_command}"
+        run "sudo -u #{node_user} forever restart #{current_path}/#{app_command}"
       else
         sudo "stop #{upstart_job_name}; true"
         sudo "start #{upstart_job_name}"
